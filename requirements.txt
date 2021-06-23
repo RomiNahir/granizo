@@ -9,7 +9,6 @@ beautifulsoup4==4.9.3
 bleach==3.1.5
 branca==0.4.1
 Brotli==1.0.7
-Cartopy==0.18.0
 cdata==0.1.9
 cdsapi==0.5.1
 certifi==2020.4.5.2
