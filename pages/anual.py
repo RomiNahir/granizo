@@ -58,6 +58,7 @@ layout = html.Div(
 
                 dbc.Col(    
                     children=[
+                        html.Div(id='htmlContainer'),
                         dbc.Tabs(
                             [
                                 dbc.Tab(dcc.Graph(id="graph"), label="Mapa", labelClassName="text-success"),
@@ -73,7 +74,8 @@ layout = html.Div(
 
 # Update Map Graph
 @app.callback(
-    Output("graph", "figure"),
+    [Output("graph", "figure"),
+     Output("htmlContainer","children")],
     [Input("btnAnnual","n_clicks"),
      Input("btnAnnualPeriod","n_clicks"),
      State("txtYearFrequency","value"),
@@ -92,9 +94,13 @@ def update_graph(frequencyA,frequencyP,year,period):
         data = originaldf[originaldf["Año"] == year]
 
         data = data[["Latitud", "Longitud", "Frecuencia"]]
+
+        returnAlert= [dbc.Alert(f'Frecuencia de eventos en el año {year}' , color="light",style = {'margin-top' : '5px','text-align': 'center'})]
     else:
 
         data = meandf[meandf["Periodo"] == period]
+        returnAlert= [dbc.Alert(f'Promedio anual de eventos durante el periodo {period}' , color="light",style = {'margin-top' : '5px','text-align': 'center'})]
+
 
     fig = px.scatter_mapbox(data, lat="Latitud", lon="Longitud", color="Frecuencia",
                         color_continuous_scale=px.colors.cyclical.IceFire, 
@@ -108,7 +114,7 @@ def update_graph(frequencyA,frequencyP,year,period):
 
     fig.update_traces(marker=dict(size=14))
 
-    return fig
+    return(fig,returnAlert)
 
 @app.callback(
       Output("data-table", "children"),
