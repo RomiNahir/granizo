@@ -6,20 +6,26 @@ from app import app
 import plotly.express as px
 import dash_table
 import pandas as pd
+import dash
+
 
 originaldf = pd.read_csv('frecuencia.csv', 
                          sep=',', header = 0,
                          names=['ID', 'Nombre', 'Latitud', 'Longitud', 'Altura', 'Año', 'Frecuencia'])
 
-prueba_tabla = originaldf.head()
+
+meandf = pd.read_csv('medias_periodos.csv', 
+                         sep=',', header = 0,
+                         names=['ID', 'Nombre', 'Latitud', 'Longitud', 'Altura', 'Frecuencia', 
+                                'Periodo'])                         
 
 Variables = {
-    "1960-1979": "Dew Point Temperature",
-    "1980-1999": "Air Temperature",
-    "2000-2019": "Precipitation",
-    "1960-1999": "Pressure",
-    "1980-2019": "Cloud Fraction",
-    "1960-2019": "Wind Direction",
+    "1960-1979": "1960-1979",
+    "1980-1999": "1980-1999",
+    "2000-2019": "2000-2019",
+    "1960-1999": "1960-1999",
+    "1980-2019": "1980-2019",
+    "1960-2019": "1960-2019",
 }
 
 layout = html.Div(
@@ -33,18 +39,20 @@ layout = html.Div(
                                         className="ml-2", style={'font-size': '12px'})]),
                                     dbc.Input(id="txtYearFrequency", placeholder="Elije un año...", type="number",min=1930, 
                                             max=2019, step=1,style = {'width' : '30%', 'margin-top' : '5px'}),
-                                    dbc.Button("Seleccionar", id="btnFrequency", outline=True, 
+                                    dbc.Button("Seleccionar", id="btnAnnual", outline=True, 
                                             color="success", className="mt-3 mb-5"),
                                 ]),
                               html.Div(
                                 children=[    
                                     html.H3('Promedio anual por periodos'),
-                                    dcc.Dropdown(id="variable-dropdown",
+                                    dcc.Dropdown(id="ddlPeriod",
                                             options=[
                                                 {"label": key, "value": value} for key, value in Variables.items()],
-                                                    value="Air Temperature", 
+                                                    value="1960-2019", 
                                                     style = {'font-size': '16px', 'white-space': 'nowrap', 'text-overflow': 'ellipsis'}
-                                    )
+                                    ),
+                                    dbc.Button("Seleccionar", id="btnAnnualPeriod", outline=True, 
+                                            color="success", className="mt-3 mb-5"),
                                 ],style = {'width' : '90%', 'margin-top' : '5px'})
                             ],md=4),
 
@@ -66,16 +74,27 @@ layout = html.Div(
 # Update Map Graph
 @app.callback(
     Output("graph", "figure"),
-    [Input("btnFrequency","n_clicks"),
+    [Input("btnAnnual","n_clicks"),
+     Input("btnAnnualPeriod","n_clicks"),
      State("txtYearFrequency","value"),
+     State("ddlPeriod","value")
     ],
 )
-def update_graph(n_clicks,value):
-    
-    #Año seleccionado
-    data = originaldf[originaldf["Año"] == value]
+def update_graph(frequencyA,frequencyP,year,period):
 
-    data = data[["Latitud", "Longitud", "Frecuencia"]]
+    context = dash.callback_context
+
+    buttonClicked = context.triggered[0]['prop_id'].split('.')[0] 
+
+    if (buttonClicked == "btnAnnual"):
+
+        #Año seleccionado
+        data = originaldf[originaldf["Año"] == year]
+
+        data = data[["Latitud", "Longitud", "Frecuencia"]]
+    else:
+
+        data = meandf[meandf["Periodo"] == period]
 
     fig = px.scatter_mapbox(data, lat="Latitud", lon="Longitud", color="Frecuencia",
                         color_continuous_scale=px.colors.cyclical.IceFire, 
@@ -84,19 +103,16 @@ def update_graph(n_clicks,value):
 
     fig.update_layout(margin={"r": 0, "t": 0, "l": 0, "b": 0})
     fig.update_layout(coloraxis_colorbar=dict(thickness=30,
-                           ticklen=1, tickcolor='black',tickvals = [0,1,2,3,4,5,6,7,8,9,10],
-                           tickfont=dict(size=15, color='black')))
+                            ticklen=1, tickcolor='black',tickvals = [0,1,2,3,4,5,6,7,8,9,10],
+                            tickfont=dict(size=15, color='black')))
 
     fig.update_traces(marker=dict(size=14))
-
-    returnedToast = dbc.Toast([html.P("Search Cleared")], header=("Success"), icon="success", dismissable=True, style={
-            "position": "fixed", "top": 66, "right": 20, "width": 350, "background-color": "green", "color": "white"})
 
     return fig
 
 @app.callback(
       Output("data-table", "children"),
-     [Input("btnFrequency","n_clicks"),
+     [Input("btnAnnual","n_clicks"),
       State("txtYearFrequency","value"),
          ])
 
