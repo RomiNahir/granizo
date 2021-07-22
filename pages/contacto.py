@@ -8,32 +8,32 @@ from app import app
 email_input = dbc.FormGroup([dbc.Label("Email", html_for="example-email-row", width=2)
                     , dbc.Col(dbc.Input(type="email"
                                         , id="example-email-row"
-                                        , placeholder="Enter email") 
+                                        , placeholder="Deja tu correo electrónico") 
                                 , width=10) 
                         ], row=True)
-user_input = dbc.FormGroup([dbc.Label("Name", html_for="example-name-row", width=2)
+user_input = dbc.FormGroup([dbc.Label("Nombre", html_for="example-name-row", width=2)
                     ,dbc.Col(dbc.Input(type="text"
                                         , id="example-name-row"
-                                        , placeholder="Enter Name"
+                                        , placeholder="Escribe tu nombre"
                                         , maxLength = 80)
                             , width=10) 
                     ],row=True)
-message = dbc.FormGroup([dbc.Label("Message", html_for="example-message-row", width=2)
+message = dbc.FormGroup([dbc.Label("Mensaje", html_for="example-message-row", width=2)
                     ,dbc.Col(dbc.Textarea(id = "example-message-row"
                                         , className="mb-3"
-                                        , placeholder="Enter message"
+                                        , placeholder="Escribe tu mensaje"
                                         , required = True)
                             , width=10)
                 ], row=True)
 
-markdown = '''# Contact Form'''
+markdown = '''# Deje su mensaje (Proximamente)'''
 
 
 form = html.Div([ dbc.Container([dcc.Markdown(markdown)
             , html.Br()
             , dbc.Card(dbc.CardBody([dbc.Form([email_input, user_input, message])
                 ,html.Div(id = 'div-button', children = [
-                    dbc.Button('Submit', color = 'success', id='button-submit', n_clicks=0)
+                    dbc.Button('Enviar', color = 'success', id='button-submit', n_clicks=0)
                 ]) 
                 ])
             )

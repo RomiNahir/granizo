@@ -35,8 +35,9 @@ layout = html.Div(
                 dbc.Col(
                     children=[html.Div(
                                 children=[
-                                    html.H3(['Frecuencia anual',dbc.Badge("info", color="info", pill = True,
-                                        className="ml-2", style={'font-size': '12px'})]),
+                                    html.H3(['Frecuencia anual',dbc.Badge("info", id= "tooltip",color="info", pill = True,
+                                        className="ml-2", style={'font-size': '12px'}),
+                                        dbc.Tooltip("Número de eventos de granizo por año",target="tooltip")]),
                                     dbc.Input(id="txtYearFrequency", placeholder="Elije un año...", type="number",min=1930, 
                                             max=2019, step=1,style = {'width' : '30%', 'margin-top' : '5px'}),
                                     dbc.Button("Seleccionar", id="btnAnnual", outline=True, 
@@ -119,19 +120,34 @@ def update_graph(frequencyA,frequencyP,year,period):
 @app.callback(
       Output("data-table", "children"),
      [Input("btnAnnual","n_clicks"),
-      State("txtYearFrequency","value"),
+     Input("btnAnnualPeriod","n_clicks"),
+     State("txtYearFrequency","value"),
+     State("ddlPeriod","value"),
          ])
 
-def update_datatable(n_clicks,value):
+def update_datatable(frequencyA,frequencyP,year,period):
 
-    data = originaldf[originaldf["Año"] == value]
+    context = dash.callback_context
 
-    data = data[["Nombre","Latitud", "Longitud", "Frecuencia"]]
+    buttonClicked = context.triggered[0]['prop_id'].split('.')[0] 
+
+    if (buttonClicked == "btnAnnual"):
+
+        data = originaldf[originaldf["Año"] == year]
+
+        data = data[["Nombre","Latitud", "Longitud", "Frecuencia"]]
+   
+    else:
+        data = meandf[meandf['Periodo']== period]
+
+        data = data.rename(columns={'Frecuencia':'Promedio anual'})
+
+        data = data[["Nombre","Latitud", "Longitud", "Promedio anual"]]
 
     tabla = data.to_dict('records')
-    
+        
     columns =  [{"name": i, "id": i,} for i in (data.columns)]
-   
+
     return ([dash_table.DataTable(
                 sort_action="native",
                 page_action="native",
