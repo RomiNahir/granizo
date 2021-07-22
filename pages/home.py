@@ -2,7 +2,7 @@ import dash_html_components as html
 import dash_core_components as dcc
 import dash_bootstrap_components as dbc
 from app import app
-from pages import contacto, home,anual
+from pages import contacto, home,anual,info
 
 layout = html.Div([
     dbc.Container([
@@ -39,7 +39,7 @@ layout = html.Div([
             dbc.Col(dbc.Card(children=[html.H3(children='Más información sobre esta página',
                                                className="text-center"),
                                        dbc.Button("Ir",
-                                                  href="",
+                                                  href="/info",
                                                   color="secondary",
                                                   className="mt-3"),
 

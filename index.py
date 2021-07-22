@@ -5,7 +5,7 @@ import dash_html_components as html
 from dash.dependencies import Input, Output, State
 from app import server
 from app import app
-from pages import contacto, home,anual
+from pages import contacto, home,anual,info
 
 
 dropdown = dbc.DropdownMenu(
@@ -91,13 +91,15 @@ def display_page(pathname):
         return contacto.layout
     elif pathname == "/anual":
         return anual.layout
+    elif pathname == "/info":
+        return info.layout    
     # elif pathname == "/mensual":
     #     return mensual.layout         
     return dbc.Jumbotron(
         [
             html.H1("404: Not found", className="text-danger"),
             html.Hr(),
-            html.P(f"The pathname {pathname} was not recognised..."),
+            html.P(f"La página {pathname} no fue encontrada..."),
         ]
     )    
 
